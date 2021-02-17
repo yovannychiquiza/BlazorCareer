@@ -1,0 +1,83 @@
+﻿@page "/country/list"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h1>Country</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (country == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in country)
+            {
+                <tr>
+                    <td>@item.Code</td>
+                    <td>@item.Name</td>
+                    <td>
+                        <button class="btn btn-danger"
+                                @onclick="(() => DeleteCountry(item))">
+                            Delete
+                        </button>
+                        <button class="btn btn-info"
+                                @onclick="(() => EditCountry(item.Code))">
+                            Edit
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        <button class="btn btn-success" @onclick="CreateCountry">Create</button>
+    </div>
+}
+
+
+@code {
+    private List<Country> country;
+
+    string uri = BlazorCareer.Client.Service.Services.uri;
+
+    protected override async Task OnInitializedAsync()
+    {
+        country = await Http.GetFromJsonAsync<List<Country>>(uri);
+    }
+
+    private async Task DeleteCountry(Country model)
+    {
+
+        var request = new HttpRequestMessage()
+        {
+            Method = new HttpMethod("DELETE"),
+            RequestUri = new Uri(uri),
+            Content = JsonContent.Create(new Country[] { model })
+        };
+        var response = await Http.SendAsync(request);
+
+        country.Remove(model);
+        StateHasChanged();
+    }
+
+    private void EditCountry(string countryId)
+    {
+        Navigation.NavigateTo("/country/edit/" + countryId);
+    }
+
+    private void CreateCountry()
+    {
+        Navigation.NavigateTo("/country/create");
+    }
+
+}
