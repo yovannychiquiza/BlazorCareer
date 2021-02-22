@@ -1,3 +1,3 @@
 # BlazorCareer
 
-Example of a web application using .NET WebAssembly Blazor
+Example of a web application using .NET 5 WebAssembly Blazor
